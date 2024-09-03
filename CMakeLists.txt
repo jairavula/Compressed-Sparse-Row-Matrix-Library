@@ -5,6 +5,8 @@ project(P1_1 CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 set(MATRIX_SOURCE
   Matrix.hpp Matrix.cpp)
 
@@ -12,6 +14,8 @@ set(TEST_SOURCE
   student_tests.cpp)
 
 set(SOURCE ${MATRIX_SOURCE})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
 
 # create unittests
 add_executable(student-tests catch.hpp student_catch.cpp ${SOURCE} ${TEST_SOURCE})

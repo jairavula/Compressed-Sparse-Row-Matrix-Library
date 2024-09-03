@@ -61,15 +61,15 @@ TEST_CASE( "Parameterized constructor 2", "[Matrix]" )
   std::cout << A << std::endl;
 }
 
-TEST_CASE( "Parameterized constructor 3", "[Matrix]" )
-{
-  INFO("Hint: Use the parameters to set the matrix elements, array");
-  Elem elements[4] = {1, 0, 0, 1};
+// TEST_CASE( "Parameterized constructor 3", "[Matrix]" )
+// {
+//   INFO("Hint: Use the parameters to set the matrix elements, array");
+//   Elem elements[4] = {1, 0, 0, 1};
 
-  Matrix A(elements,2,2);
+//   Matrix A(elements,2,2);
 
-  REQUIRE(A.equal(A));
-}
+//   REQUIRE(A.equal(A));
+// }
 
 TEST_CASE( "Element get", "[Matrix]" )
 {

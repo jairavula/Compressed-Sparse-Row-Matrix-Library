@@ -33,6 +33,80 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
 
   };
 
+  Elem Matrix::e(std::size_t i, std::size_t j) const{
+    if (i < row_ind.size()-1){
+      for (std::size_t index = row_ind[i]; index < row_ind[i+1]; index++) {
+      if (col_ind[index] == j){
+        return elements[index];
+        }
+      }
+    }
+    return 0;
+  }
+  
+
+  bool Matrix::e(std::size_t i, std::size_t j, Elem aij){
+    return true;
+  
+  }
+
+  std::size_t Matrix::size(std::size_t dim) const {
+    if (dim == 1){
+      return (row_ind.size()-1);
+    } else if (dim == 2) {
+      return n;
+    } else return 0;
+  }
+
+  bool Matrix::equal( const Matrix& rhs ) const {
+    return true;
+  }
+  Matrix Matrix::add( const Matrix &rhs ) const {
+    return Matrix();
+  }
+  Matrix Matrix::sub( const Matrix &rhs ) const{
+    return Matrix();
+  }
+  Matrix Matrix::mult( const Matrix &rhs ) const{
+    return Matrix();
+  }
+  Matrix Matrix::mult( Scalar k ) const{
+    return Matrix();
+  }
+  Matrix Matrix::pow( Scalar k ) const{
+    return Matrix();
+  }
+  Matrix Matrix::trans() const{
+    return Matrix();
+  }
+  Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const{
+    return Matrix();
+  }
+
+
+
+  bool Matrix::rowSwitch(std::size_t i, std::size_t j){
+    return true;
+  }
+
+  bool Matrix::rowMult(std::size_t i, Scalar k){
+    return true;
+  }
+  
+
+  bool Matrix::rowAdd(std::size_t i, std::size_t j, Scalar k){
+    return true;
+  }
+  
+
+
+
+
+
+
+
+
+
 
 
 //You'll implement this method in part two of the project
