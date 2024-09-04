@@ -92,56 +92,133 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
     else return false;
   }
 
-  Matrix Matrix::add( const Matrix &rhs ) const {
-    if( row_ind.size() != rhs.row_ind.size() || n != rhs.n){
-      return Matrix(0,0);
+Matrix Matrix::add(const Matrix &rhs) const {
+    if (row_ind.size() != rhs.row_ind.size() || n != rhs.n) {
+        return Matrix(0, 0);  // Inconsistent dimensions
     }
-    // create empty m x n array and start row_ind array with a 0
-    Matrix summed_matrix(row_ind.size()-1, n); 
-    summed_matrix.row_ind.push_back(0);
 
-    // iteration through row index array
-    for(int i=0; i < row_ind.size()-1; i++){
-      // scope on one row at a time
-      int matrix1_row_start = row_ind[i];
-      int matrix1_row_end = row_ind[i+1];
+    // Create the result matrix and initialize with empty row_ind
+    Matrix summed_matrix(0, n);
 
-      int matrix2_row_start = rhs.row_ind[i];
-      int matrix2_row_end = rhs.row_ind[i+1];
-      
-      while (matrix1_row_start != matrix1_row_end || matrix2_row_start != matrix2_row_end) {
-        if (matrix1_row_start == matrix1_row_end) {
-        summed_matrix.elements.push_back(rhs.elements[matrix2_row_start]);
-        summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
-        matrix2_row_start++;
-        } else if (matrix2_row_start == matrix2_row_end) {
-        summed_matrix.elements.push_back(elements[matrix1_row_start]);
-        summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
-        matrix1_row_start++;
-        } else if(col_ind[matrix1_row_start] == rhs.col_ind[matrix2_row_start]){
-          summed_matrix.elements.push_back(elements[matrix1_row_start] + rhs.elements[matrix2_row_start]);
-          summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
-          matrix1_row_start++;
-          matrix2_row_start++;
-        } else if(col_ind[matrix1_row_start] < rhs.col_ind[matrix2_row_start]) {
-          summed_matrix.elements.push_back(elements[matrix1_row_start]);
-          summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
-          matrix1_row_start++;
-        } else if(col_ind[matrix1_row_start] > rhs.col_ind[matrix2_row_start]){
-          summed_matrix.elements.push_back(elements[matrix2_row_start]);
-          summed_matrix.col_ind.push_back(col_ind[matrix2_row_start]);
-          matrix2_row_start++;
+    // Iterate through each row of the matrix
+    for (std::size_t i = 0; i < row_ind.size() - 1; ++i) {
+        std::size_t matrix1_row_start = row_ind[i];
+        std::size_t matrix1_row_end = row_ind[i + 1];
+
+        std::size_t matrix2_row_start = rhs.row_ind[i];
+        std::size_t matrix2_row_end = rhs.row_ind[i + 1];
+
+        // Add non-zero elements from both matrices
+        while (matrix1_row_start != matrix1_row_end || matrix2_row_start != matrix2_row_end) {
+            if (matrix1_row_start == matrix1_row_end) {
+                // If matrix 1 has no more elements, take from matrix 2
+                summed_matrix.elements.push_back(rhs.elements[matrix2_row_start]);
+                summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
+                matrix2_row_start++;
+            } else if (matrix2_row_start == matrix2_row_end) {
+                // If matrix 2 has no more elements, take from matrix 1
+                summed_matrix.elements.push_back(elements[matrix1_row_start]);
+                summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                matrix1_row_start++;
+            } else if (col_ind[matrix1_row_start] == rhs.col_ind[matrix2_row_start]) {
+                // If both matrices have elements at the same column, add them
+                summed_matrix.elements.push_back(elements[matrix1_row_start] + rhs.elements[matrix2_row_start]);
+                summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                matrix1_row_start++;
+                matrix2_row_start++;
+            } else if (col_ind[matrix1_row_start] < rhs.col_ind[matrix2_row_start]) {
+                // Take element from matrix 1 if its column is smaller
+                summed_matrix.elements.push_back(elements[matrix1_row_start]);
+                summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                matrix1_row_start++;
+            } else {
+                // Take element from matrix 2 if its column is smaller
+                summed_matrix.elements.push_back(rhs.elements[matrix2_row_start]);
+                summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
+                matrix2_row_start++;
+            }
         }
-      }
-      summed_matrix.row_ind.push_back(summed_matrix.elements.size()-1);
-    }  
+
+        // After finishing this row, update `row_ind` with the current number of elements
+        summed_matrix.row_ind.push_back(summed_matrix.elements.size());
+    }
     return summed_matrix;
-  }
+}
 
 
-  Matrix Matrix::sub( const Matrix &rhs ) const{
-    return Matrix();
-  }
+Matrix Matrix::sub(const Matrix &rhs) const {
+    if (row_ind.size() != rhs.row_ind.size() || n != rhs.n) {
+        return Matrix(0, 0);  // Inconsistent dimensions
+    }
+
+    // Create the result matrix and initialize with empty row_ind
+    Matrix summed_matrix(0, n);
+
+    // Iterate through each row of the matrix
+    for (std::size_t i = 0; i < row_ind.size() - 1; ++i) {
+        std::size_t matrix1_row_start = row_ind[i];
+        std::size_t matrix1_row_end = row_ind[i + 1];
+
+        std::size_t matrix2_row_start = rhs.row_ind[i];
+        std::size_t matrix2_row_end = rhs.row_ind[i + 1];
+
+        // Track the number of elements at the start of the current row
+        std::size_t summed_matrix_start = summed_matrix.elements.size();
+
+        // Subtract non-zero elements from both matrices
+        while (matrix1_row_start != matrix1_row_end || matrix2_row_start != matrix2_row_end) {
+            if (matrix1_row_start == matrix1_row_end) {
+                // If matrix 1 has no more elements, subtract from 0
+                if (rhs.elements[matrix2_row_start] != 0) {
+                    summed_matrix.elements.push_back(-rhs.elements[matrix2_row_start]);
+                    summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
+                }
+                matrix2_row_start++;
+            } else if (matrix2_row_start == matrix2_row_end) {
+                // If matrix 2 has no more elements, take from matrix 1
+                if (elements[matrix1_row_start] != 0) {
+                    summed_matrix.elements.push_back(elements[matrix1_row_start]);
+                    summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                }
+                matrix1_row_start++;
+            } else if (col_ind[matrix1_row_start] == rhs.col_ind[matrix2_row_start]) {
+                // If both matrices have elements at the same column, subtract them
+                Elem result = elements[matrix1_row_start] - rhs.elements[matrix2_row_start];
+                if (result != 0) {
+                    summed_matrix.elements.push_back(result);
+                    summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                }
+                matrix1_row_start++;
+                matrix2_row_start++;
+            } else if (col_ind[matrix1_row_start] < rhs.col_ind[matrix2_row_start]) {
+                // Take element from matrix 1 if its column is smaller
+                if (elements[matrix1_row_start] != 0) {
+                    summed_matrix.elements.push_back(elements[matrix1_row_start]);
+                    summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+                }
+                matrix1_row_start++;
+            } else {
+                // Take element from matrix 2 if its column is smaller, subtract from 0
+                if (rhs.elements[matrix2_row_start] != 0) {
+                    summed_matrix.elements.push_back(-rhs.elements[matrix2_row_start]);
+                    summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
+                }
+                matrix2_row_start++;
+            }
+        }
+
+        // After finishing this row, update `row_ind` if non-zero elements were added
+        if (summed_matrix.elements.size() > summed_matrix_start) {
+            summed_matrix.row_ind.push_back(summed_matrix.elements.size());
+        } else {
+            // Ensure the row_ind array is consistent even for empty rows
+            summed_matrix.row_ind.push_back(summed_matrix_start);
+        }
+    }
+
+    return summed_matrix;
+}
+
   Matrix Matrix::mult( const Matrix &rhs ) const{
     return Matrix();
   }

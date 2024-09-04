@@ -235,7 +235,7 @@ TEST_CASE("My Method equal", "[Matrix]")
 
 }
 
-TEST_CASE("Method- Matrix add", "[Matrix]")
+TEST_CASE("Method- Matrix add 1", "[Matrix]")
 {
   INFO("Add two matrices together")
   std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0};
@@ -247,12 +247,48 @@ TEST_CASE("Method- Matrix add", "[Matrix]")
   std::vector<Elem> summed_elements = {2, 2, 3, 4, 5, 12, 14, 8, 9};
   Matrix C(summed_elements,cols);
 
-   std::cout << B << std::endl;
-  // std::cout << B << std::endl;
-  // std::cout << C << std::endl;
+  Matrix D = A.add(B);
 
-  REQUIRE(A.add(B).equal(C));
+  REQUIRE(D.equal(C));
 
-  
+}
+
+TEST_CASE("Method- Matrix add 2", "[Matrix]")
+{
+  INFO("Add two matrices together")
+  std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0, 0, 3, 2};
+  std::vector<Elem> elements2 = {1, 2, 0, 4, 5, 6, 7, 0, 9, 0, 0, 1};
+  std::size_t cols = 4;
+  Matrix A(elements, cols);
+  Matrix B(elements2, cols);
+
+  std::vector<Elem> summed_elements = {2,2,3,4,5,12,14,8,9,0,3,3};
+  Matrix C(summed_elements,cols);
+
+  Matrix D = A.add(B);
+
+  REQUIRE(D.equal(C));
+
+}
+
+TEST_CASE("Method- Matrix sub 1", "[Matrix]")
+{
+  INFO("Subtract two matrices together")
+  std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0, 0, 3, 2};
+  std::vector<Elem> elements2 = {1, 2, 0, 4, 5, 6, 7, 0, 9, 0, 0, 1};
+  std::size_t cols = 4;
+  Matrix A(elements, cols);
+  Matrix B(elements2, cols);
+
+  std::vector<Elem> summed_elements = {0,-2,3,-4,-5,0,0,8,-9,0,3,1};
+  Matrix C(summed_elements,cols);
+
+  Matrix D = A.sub(B);
+
+  std::cout << D << std::endl;
+
+  std::cout << C << std::endl;
+
+  REQUIRE(D.equal(C));
 
 }
