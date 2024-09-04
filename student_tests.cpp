@@ -235,3 +235,25 @@ TEST_CASE("My Method equal", "[Matrix]")
   REQUIRE(A.equal(B));
 
 }
+
+TEST_CASE("Matrix add", "[Matrix]")
+{
+  INFO("Add two matrices together")
+  std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0};
+  std::vector<Elem> elements2 = {1, 2, 0, 4, 5, 6, 7, 0, 9};
+  std::size_t cols = 3;
+  Matrix A(elements, cols);
+  Matrix B(elements2, cols);
+
+  std::vector<Elem> summed_elements = {2, 2, 3, 4, 5, 12, 14, 8, 9};
+  Matrix C(summed_elements,cols);
+
+  std::cout << A << std::endl;
+  std::cout << B << std::endl;
+  std::cout << C << std::endl;
+
+  REQUIRE(A.add(B).equal(C));
+
+  
+
+}

@@ -15,29 +15,39 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
    * @param A - values for matrix elements, specified using a dense, row-major order vector
    * @param n - number of columns for the new matrix.
    */ 
-  Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind(A.size()/n,0) {
+  Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind() {
+
+    int current_row_index = 0;
+    row_ind.push_back(0);
 
       //populate the elements array
       for(int i = 0; i < A.size(); i++){
         if (A[i] != 0){
           elements.push_back(A[i]);
-        }
-      }
-
-      // populate the column indices array
-      for(int i = 0; i < A.size(); i++) {
-        if (A[i] != 0) {
           col_ind.push_back(i % n);
+          current_row_index++;
         }
-
-        //populate the row pointer array
         if (i % n == 0 && i != 0) {
-          row_ind.push_back(i);
+          row_ind.push_back(current_row_index);
         }
       }
-      // last element in row pointer array holds the number of elements + 1
-      row_ind.push_back(elements.size() + 1);
+       std::cout << "Elements: ";
+    for (auto elem : elements) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
 
+    std::cout << "Column Indices: ";
+    for (auto col : col_ind) {
+        std::cout << col << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Row Indices: ";
+    for (auto row : row_ind) {
+        std::cout << row << " ";
+    }
+    std::cout << std::endl;
   };
 
   //  /**
@@ -97,7 +107,7 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
   }
 
   bool Matrix::equal( const Matrix& rhs ) const {
-    // Ensure full CSR representations vectors are equal in both matrices
+    // Ensure full CSR representation vectors are equal in both matrices
     if ((rhs.elements == elements) && (rhs.col_ind == col_ind) && (rhs.row_ind == row_ind)){
       return true;
     }
@@ -105,8 +115,52 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
   }
 
   Matrix Matrix::add( const Matrix &rhs ) const {
-    return Matrix();
+    if( row_ind.size() != rhs.row_ind.size() || n != rhs.n){
+      return Matrix(0,0);
+    }
+    // create empty m x n array and start row_ind array with a 0
+    Matrix summed_matrix(row_ind.size()-1, n); 
+    summed_matrix.row_ind.push_back(0);
+
+    // iteration through row index array
+    for(int i=0; i < row_ind.size()-1; i++){
+      // scope on one row at a time
+      int matrix1_row_start = row_ind[i];
+      int matrix1_row_end = row_ind[i+1];
+
+      int matrix2_row_start = rhs.row_ind[i];
+      int matrix2_row_end = rhs.row_ind[i+1];
+      
+      while (matrix1_row_start != matrix1_row_end || matrix2_row_start != matrix2_row_end) {
+        if (matrix1_row_start == matrix1_row_end) {
+        summed_matrix.elements.push_back(rhs.elements[matrix2_row_start]);
+        summed_matrix.col_ind.push_back(rhs.col_ind[matrix2_row_start]);
+        matrix2_row_start++;
+        } else if (matrix2_row_start == matrix2_row_end) {
+        summed_matrix.elements.push_back(elements[matrix1_row_start]);
+        summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+        matrix1_row_start++;
+        } else if(col_ind[matrix1_row_start] == rhs.col_ind[matrix2_row_start]){
+          summed_matrix.elements.push_back(elements[matrix1_row_start] + rhs.elements[matrix2_row_start]);
+          summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+          matrix1_row_start++;
+          matrix2_row_start++;
+        } else if(col_ind[matrix1_row_start] < rhs.col_ind[matrix2_row_start]) {
+          summed_matrix.elements.push_back(elements[matrix1_row_start]);
+          summed_matrix.col_ind.push_back(col_ind[matrix1_row_start]);
+          matrix1_row_start++;
+        } else if(col_ind[matrix1_row_start] > rhs.col_ind[matrix2_row_start]){
+          summed_matrix.elements.push_back(elements[matrix2_row_start]);
+          summed_matrix.col_ind.push_back(col_ind[matrix2_row_start]);
+          matrix2_row_start++;
+        }
+      }
+      summed_matrix.row_ind.push_back(summed_matrix.elements.size()-1);
+    }  
+    return summed_matrix;
   }
+
+
   Matrix Matrix::sub( const Matrix &rhs ) const{
     return Matrix();
   }

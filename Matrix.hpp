@@ -83,6 +83,7 @@ public:
    * @param dim - 1 for row, 2 for column
    * @return the length of the dimension specified, if dimension is not valid return 0
    */ 
+
   std::size_t size(std::size_t dim) const;
   
  /**
