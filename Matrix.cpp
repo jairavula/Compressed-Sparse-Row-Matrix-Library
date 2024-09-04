@@ -9,45 +9,23 @@ Matrix::Matrix() : elements(), col_ind(), row_ind(3), n(2) {}
 
 Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m + 1, 0), n(n){};
 
-
-  /**
-   * Parameterized constructor.  Use the parameters to set the matrix elements; if parameters are inconsistent then create a 0-by-0 (empty) matrix.
-   * @param A - values for matrix elements, specified using a dense, row-major order vector
-   * @param n - number of columns for the new matrix.
-   */ 
   Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind() {
 
-    int current_row_index = 0;
+    std::size_t nonzero_elements = 0;
     row_ind.push_back(0);
 
-      //populate the elements array
+      //populate the elements array and corresponding column index. 
       for(int i = 0; i < A.size(); i++){
         if (A[i] != 0){
           elements.push_back(A[i]);
           col_ind.push_back(i % n);
-          current_row_index++;
+          nonzero_elements++;
         }
-        if (i % n == 0 && i != 0) {
-          row_ind.push_back(current_row_index);
+        //push back the index of non-zero elements to the row index array when a row finishes
+        if ((i + 1) % n == 0) {
+            row_ind.push_back(nonzero_elements);
         }
       }
-       std::cout << "Elements: ";
-    for (auto elem : elements) {
-        std::cout << elem << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Column Indices: ";
-    for (auto col : col_ind) {
-        std::cout << col << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Row Indices: ";
-    for (auto row : row_ind) {
-        std::cout << row << " ";
-    }
-    std::cout << std::endl;
   };
 
   //  /**
@@ -231,17 +209,29 @@ Matrix& Matrix::operator=(Matrix A)
   
 std::ostream& operator<<(std::ostream& os, const Matrix &A)
 {
-  //number of columns
-  std::size_t n = A.elements.size() / A.n;
-  
-  for(std::size_t i = 0; i < A.elements.size(); i++)
-    {
-      //beginning of a row (column zero): insert a line break unless we're in the first row
-      if(i != 0 && i % A.n == 0)
-	os << std::endl;
-      
-      os << A.elements[i] << " ";
+    // Loop through each row
+    for (std::size_t i = 0; i < A.row_ind.size() - 1; i++) {
+        std::size_t row_start = A.row_ind[i];      // Start of the current row's non-zero elements
+        std::size_t row_end = A.row_ind[i + 1];    // End of the current row's non-zero elements
+        std::size_t column_pointer = 0;            // Column index tracker
+        
+      // Execute while in scope of row
+        while (column_pointer < A.n) {
+            
+            if (row_start < row_end && A.col_ind[row_start] == column_pointer) {
+                //if there is a non-zero entry in the specified column, print the entry
+                os << A.elements[row_start] << " ";
+                row_start++;  
+            } else {
+                //if not print a 0
+                os << 0 << " ";
+            }
+            // go to next column
+            column_pointer++; 
+        }
+        // new line after row is completed
+        os << std::endl; 
     }
-
-  return os;
+    return os;
 }
+

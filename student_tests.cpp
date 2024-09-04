@@ -220,7 +220,6 @@ TEST_CASE("My 2nd Constructor", "[Matrix]"){
 
   REQUIRE(A.equal(A));
   
-  std::cout << A << std::endl;
 }
 
 TEST_CASE("My Method equal", "[Matrix]")
@@ -236,7 +235,7 @@ TEST_CASE("My Method equal", "[Matrix]")
 
 }
 
-TEST_CASE("Matrix add", "[Matrix]")
+TEST_CASE("Method- Matrix add", "[Matrix]")
 {
   INFO("Add two matrices together")
   std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0};
@@ -248,9 +247,9 @@ TEST_CASE("Matrix add", "[Matrix]")
   std::vector<Elem> summed_elements = {2, 2, 3, 4, 5, 12, 14, 8, 9};
   Matrix C(summed_elements,cols);
 
-  std::cout << A << std::endl;
-  std::cout << B << std::endl;
-  std::cout << C << std::endl;
+   std::cout << B << std::endl;
+  // std::cout << B << std::endl;
+  // std::cout << C << std::endl;
 
   REQUIRE(A.add(B).equal(C));
 
