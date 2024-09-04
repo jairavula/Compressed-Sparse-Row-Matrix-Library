@@ -16,13 +16,20 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
    * @param n - number of columns for the new matrix.
    */ 
   Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind(A.size()/n,0) {
-      elements = A;
+
+      //populate the elements array
+      for(int i = 0; i < A.size(); i++){
+        if (A[i] != 0){
+          elements.push_back(A[i]);
+        }
+      }
+
       // populate the column indices array
-      int row_num = 0;
-      for(int i = 0; i < elements.size(); i++) {
-        if (elements[i] != 0) {
+      for(int i = 0; i < A.size(); i++) {
+        if (A[i] != 0) {
           col_ind.push_back(i % n);
         }
+
         //populate the row pointer array
         if (i % n == 0 && i != 0) {
           row_ind.push_back(i);
@@ -33,20 +40,51 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
 
   };
 
+  //  /**
+  //  * Another parameterized constructor.  Use the parameters to set the matrix element; if parameters are inconsistent then create a 0-by-0 (empty) matrix.
+  //  * @param ptr_A - pointer to a dense, row-major order array of matrix elements
+  //  * @param m - number of rows for the new matrix.
+  //  * @param n - number of columns for the new matrix.
+  //  */ 
+  // Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n) : n(n){
+
+  // }
+
+
   Elem Matrix::e(std::size_t i, std::size_t j) const{
+    // 1. Ensure i is a valid row number
+    // 2. Iterate through the column index using the possible entry indices from the row index
+    // 3. Look for a column index matching j
+
+
     if (i < row_ind.size()-1){
       for (std::size_t index = row_ind[i]; index < row_ind[i+1]; index++) {
       if (col_ind[index] == j){
         return elements[index];
         }
       }
-    }
+    } 
+    // return 0 if value not found
     return 0;
   }
   
 
   bool Matrix::e(std::size_t i, std::size_t j, Elem aij){
-    return true;
+
+    // TODO: Double check logic here
+    if (j > n || i > row_ind.size()-1) {
+      return false;
+    }
+  
+    if (i < row_ind.size()-1){
+      for (std::size_t index = row_ind[i]; index < row_ind[i+1]; index++) {
+      if (col_ind[index] == j){
+        elements[index] = aij;
+        return true;
+        }
+      }
+    }
+    return false;
   
   }
 
@@ -59,8 +97,13 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
   }
 
   bool Matrix::equal( const Matrix& rhs ) const {
-    return true;
+    // Ensure full CSR representations vectors are equal in both matrices
+    if ((rhs.elements == elements) && (rhs.col_ind == col_ind) && (rhs.row_ind == row_ind)){
+      return true;
+    }
+    else return false;
   }
+
   Matrix Matrix::add( const Matrix &rhs ) const {
     return Matrix();
   }
@@ -82,8 +125,6 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
   Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const{
     return Matrix();
   }
-
-
 
   bool Matrix::rowSwitch(std::size_t i, std::size_t j){
     return true;

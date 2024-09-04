@@ -184,7 +184,7 @@ public:
 
 private:
   std::vector<Elem> elements; //The elements of our matrix; size is equal to the number of non-zero elements
-  const std::size_t n; //number of  in the matrix (const as matrices shouldn't change size after being defined)
+  const std::size_t n; //number of columns in the matrix (const as matrices shouldn't change size after being defined)
   std::vector<std::size_t> col_ind; //column for the i-th element of elements (i.e., col_ind[i] is the column for elements[i])
   std::vector<std::size_t> row_ind; //number of non-zero elements above row i (i.e., row_ind[i] = sum(non-zero elements in
                                     //rows zero to i-1)), remember this should have an extra entry at the end of the vector where

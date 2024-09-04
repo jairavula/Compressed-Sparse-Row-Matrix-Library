@@ -210,3 +210,28 @@ TEST_CASE( "Method rowAdd", "[Matrix]" )
   
   REQUIRE(A.rowAdd(1,2,k) == false);
 }
+
+// My Tests
+TEST_CASE("My 2nd Constructor", "[Matrix]"){
+  std::vector<Elem> elements = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  std::size_t cols = 3;
+
+  Matrix A(elements, cols);
+
+  REQUIRE(A.equal(A));
+  
+  std::cout << A << std::endl;
+}
+
+TEST_CASE("My Method equal", "[Matrix]")
+{
+  INFO("Check if two matrices are equal to each other")
+  std::vector<Elem> elements = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  std::vector<Elem> elements2 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  std::size_t cols = 3;
+  Matrix A(elements, cols);
+  Matrix B(elements2, cols);
+  
+  REQUIRE(A.equal(B));
+
+}
