@@ -309,29 +309,31 @@ Matrix Matrix::mult(Scalar k) const {
   Matrix Matrix::trans() const{
 
 
-for(std::size_t col = 0; col < n; col++){
+    for(std::size_t col = 0; col < n; col++){
 
-        std::vector<int> matrix2_column(row_ind.size()-1,0);
-        int matrix2_column_pos = 0;
+        std::vector<int> matrix_column(row_ind.size()-1,0);
+        int matrix_column_pos = 0;
 
         // build vector of columns
-        for(std::size_t j = 0; j < row_ind.size()-1; j++){
+        for(std::size_t j = 0; j < row_ind.size(); j++){
           int row_start = row_ind[j];
           int row_end = row_ind[j+1];
           while(row_start != row_end){
             //if the non-zero element is present at the column index, add it to the column vector  
             if(col_ind[row_start] == col){
-            matrix2_column[matrix2_column_pos] = elements[row_start];
+            matrix_column[matrix_column_pos] = elements[row_start];
             }
             row_start++;
           }
           // increment matrix2_column index to next item
-          matrix2_column_pos++;
+          matrix_column_pos++;
         }
       }
 
     return Matrix();
   }
+
+
   Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const{
     return Matrix();
   }

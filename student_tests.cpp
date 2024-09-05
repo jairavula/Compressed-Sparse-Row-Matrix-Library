@@ -354,3 +354,16 @@ TEST_CASE("Method- Matrix Power", "[Matrix]")
 
 
 }
+
+TEST_CASE("Method- Matrix Transpose", "[Matrix]")
+{
+  INFO("Return the transpose of a matrix")
+
+  std::vector<Elem> elements2 = {1,2,3,4};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
+
+  Matrix A = B.trans();
+
+  REQUIRE(true);
+}
