@@ -9,7 +9,7 @@ Matrix::Matrix() : elements(), col_ind(), row_ind(3), n(2) {}
 
 Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m + 1, 0), n(n){};
 
-  Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind() {
+Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind() {
 
     std::size_t nonzero_elements = 0;
     row_ind.push_back(0);
@@ -26,7 +26,7 @@ Matrix::Matrix(std::size_t m, std::size_t n): elements(), col_ind(), row_ind(m +
             row_ind.push_back(nonzero_elements);
         }
       }
-  };
+};
 
   //  /**
   //  * Another parameterized constructor.  Use the parameters to set the matrix element; if parameters are inconsistent then create a 0-by-0 (empty) matrix.
@@ -223,9 +223,10 @@ Matrix Matrix::sub(const Matrix &rhs) const {
     // TODO: add logic for invalid multiplication
 
     //resultant matrix in Row-Major order
-    std::vector<size_t> mult_result((row_ind.size()-1) * rhs.n, 0);
-
+    std::vector<Elem> mult_result((row_ind.size()-1) * rhs.n, 0);
+    std::size_t result_pointer = 0;
     for (std::size_t i = 0; i < row_ind.size()-1; i++){
+
       int row_start = row_ind[i];
       int row_end = row_ind[i+1];
 
@@ -243,7 +244,6 @@ Matrix Matrix::sub(const Matrix &rhs) const {
         column_index++;
       }
 
-      int rhs_column_index = 0;
 
       for(std::size_t col = 0; col < rhs.n; col++){
 
@@ -254,9 +254,9 @@ Matrix Matrix::sub(const Matrix &rhs) const {
         for(std::size_t j = 0; j < rhs.row_ind.size()-1; j++){
           int rhs_row_start = rhs.row_ind[j];
           int rhs_row_end = rhs.row_ind[j+1];
-          //if the non-zero element is present at the column index, add it to the column vector
           while(rhs_row_start != rhs_row_end){
-            if(rhs.col_ind[rhs_row_start] == rhs_column_index){
+            //if the non-zero element is present at the column index, add it to the column vector  
+            if(rhs.col_ind[rhs_row_start] == col){
             matrix2_column[matrix2_column_pos] = rhs.elements[rhs_row_start];
             }
             rhs_row_start++;
@@ -264,21 +264,72 @@ Matrix Matrix::sub(const Matrix &rhs) const {
           // increment matrix2_column index to next item
           matrix2_column_pos++;
         }
-        // look at next column in rhs matrix on next loop iteration
-        rhs_column_index++;
+        std::size_t total = 0;
+        for(std::size_t item = 0; item < n; item++){ 
+          total += matrix1_row[item] * matrix2_column[item];
+        }
+        mult_result[result_pointer] = total;
+        result_pointer++;
       }
-    
     }
     
-    return Matrix();
+    return Matrix(mult_result, rhs.n);
   }
-  Matrix Matrix::mult( Scalar k ) const{
-    return Matrix();
-  }
+
+Matrix Matrix::mult(Scalar k) const {
+    std::vector<Elem> new_elements(elements.size());
+    //copy the existing matrix and scale non-zero elements.
+    for (std::size_t entry = 0; entry < elements.size(); entry++) {
+        new_elements[entry] = elements[entry] * k;
+    }
+
+    Matrix A(new_elements, n); 
+
+    A.col_ind = col_ind;
+    A.row_ind = row_ind;
+
+    return A;
+}
+
+
   Matrix Matrix::pow( Scalar k ) const{
-    return Matrix();
+
+    Matrix A(*this);
+
+    A.col_ind = col_ind;
+    A.row_ind = row_ind;
+
+    for (int i = 0; i < k-1; i++){
+      A = A.mult(*this);
+    }
+
+    return A;
   }
+
   Matrix Matrix::trans() const{
+
+
+for(std::size_t col = 0; col < n; col++){
+
+        std::vector<int> matrix2_column(row_ind.size()-1,0);
+        int matrix2_column_pos = 0;
+
+        // build vector of columns
+        for(std::size_t j = 0; j < row_ind.size()-1; j++){
+          int row_start = row_ind[j];
+          int row_end = row_ind[j+1];
+          while(row_start != row_end){
+            //if the non-zero element is present at the column index, add it to the column vector  
+            if(col_ind[row_start] == col){
+            matrix2_column[matrix2_column_pos] = elements[row_start];
+            }
+            row_start++;
+          }
+          // increment matrix2_column index to next item
+          matrix2_column_pos++;
+        }
+      }
+
     return Matrix();
   }
   Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const{

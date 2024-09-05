@@ -285,10 +285,6 @@ TEST_CASE("Method- Matrix sub 1", "[Matrix]")
 
   Matrix D = A.sub(B);
 
-  std::cout << D << std::endl;
-
-  std::cout << C << std::endl;
-
   REQUIRE(D.equal(C));
 
 }
@@ -305,8 +301,56 @@ TEST_CASE("Method- Matrix Mult 1", "[Matrix]")
   std::size_t cols2 = 2;
   Matrix B(elements2, cols2);
 
-  A.mult(B);
+  std::vector<Elem> elements3 = {4,6,84,38,18,6};
+  std::size_t cols3 = 2;
+  Matrix D(elements3, cols3);
 
-  REQUIRE(true);
+  Matrix C = A.mult(B);
+
+  REQUIRE(C.equal(D));
+
+}
+
+TEST_CASE("Method- Matrix Mult Scalar 1", "[Matrix]")
+{
+  INFO("Multiply a matrix by a scalar value")
+
+  std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0, 0, 3, 2};
+  std::size_t cols1 = 4;
+  Matrix A(elements, cols1);
+
+  std::vector<Elem> elements2 = {2, 0, 6, 0, 0, 12, 14, 16, 0, 0, 6, 4};
+  std::size_t cols2 = 4;
+  Matrix B(elements2, cols2);
+
+  std::cout << B << std::endl;
+
+  Matrix C = A.mult(2);
+
+  std::cout << C << std::endl;
+
+  // std::cout << C << std::endl
+
+  REQUIRE(C.equal(B));
+
+}
+
+
+TEST_CASE("Method- Matrix Power", "[Matrix]")
+{
+  INFO("Multiply matrix by itself k times ")
+
+  std::vector<Elem> elements = {2,2,2,2};
+  std::size_t cols1 = 2;
+  Matrix A(elements, cols1);
+
+  std::vector<Elem> elements2 = {8,8,8,8};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
+
+  Matrix C = A.pow(2);
+
+  REQUIRE(C.equal(B));
+
 
 }
