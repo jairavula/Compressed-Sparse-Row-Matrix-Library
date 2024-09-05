@@ -231,7 +231,6 @@ Matrix Matrix::sub(const Matrix &rhs) const {
 
       // buffers for multiplication operation
       std::vector<int> matrix1_row(n, 0);
-      std::vector<int> matrix2_column(rhs.row_ind.size()-1,0);
 
       int column_index = 0;
 
@@ -245,23 +244,30 @@ Matrix Matrix::sub(const Matrix &rhs) const {
       }
 
       int rhs_column_index = 0;
-      int matrix2_column_pos = 0;
 
-      // build vector of columns
-      for(std::size_t j = 0; j < rhs.row_ind.size()-1; j++){
-        int rhs_row_start = rhs.row_ind[j];
-        int rhs_row_end = rhs.row_ind[j+1];
-        //if the non-zero element is present at the column index, add it to the column vector
-        if(rhs.col_ind[rhs_row_start] == rhs_column_index){
-          matrix2_column[matrix2_column_pos] = rhs.elements[rhs_row_start];
+      for(std::size_t col = 0; col < rhs.n; col++){
+
+        std::vector<int> matrix2_column(rhs.row_ind.size()-1,0);
+        int matrix2_column_pos = 0;
+
+        // build vector of columns
+        for(std::size_t j = 0; j < rhs.row_ind.size()-1; j++){
+          int rhs_row_start = rhs.row_ind[j];
+          int rhs_row_end = rhs.row_ind[j+1];
+          //if the non-zero element is present at the column index, add it to the column vector
+          while(rhs_row_start != rhs_row_end){
+            if(rhs.col_ind[rhs_row_start] == rhs_column_index){
+            matrix2_column[matrix2_column_pos] = rhs.elements[rhs_row_start];
+            }
+            rhs_row_start++;
+          }
+          // increment matrix2_column index to next item
+          matrix2_column_pos++;
         }
-        // increment matrix2_column index to next item
-        matrix2_column_pos++;
+        // look at next column in rhs matrix on next loop iteration
+        rhs_column_index++;
       }
-      
-      // look at next column in rhs matrix on next loop iteration
-      rhs_column_index++;
-
+    
     }
     
     return Matrix();
