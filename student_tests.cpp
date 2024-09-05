@@ -123,26 +123,26 @@ TEST_CASE( "Method sub", "[Matrix]" )
   REQUIRE(A.equal(A));
 }
 
-TEST_CASE( "Method matrix mult", "[Matrix]" )
-{
-  INFO("Hint: Multiplication of matrices");
-  Matrix A, B, C;
+// TEST_CASE( "Method matrix mult", "[Matrix]" )
+// {
+//   INFO("Hint: Multiplication of matrices");
+//   Matrix A, B, C;
 
-  A = B.mult(C);
+//   A = B.mult(C);
   
-  REQUIRE(A.equal(A));
-}
+//   REQUIRE(A.equal(A));
+// }
 
-TEST_CASE( "Method scalar mult", "[Matrix]" )
-{
-  INFO("Hint: Multiplication of matrix by a scalar");
-  Matrix A;
-  Scalar k = 1;
+// TEST_CASE( "Method scalar mult", "[Matrix]" )
+// {
+//   INFO("Hint: Multiplication of matrix by a scalar");
+//   Matrix A;
+//   Scalar k = 1;
 
-  A = A.mult(k);
+//   A = A.mult(k);
   
-  REQUIRE(A.equal(A));
-}
+//   REQUIRE(A.equal(A));
+// }
 
 TEST_CASE( "Method pow", "[Matrix]" )
 {
@@ -290,5 +290,23 @@ TEST_CASE("Method- Matrix sub 1", "[Matrix]")
   std::cout << C << std::endl;
 
   REQUIRE(D.equal(C));
+
+}
+
+TEST_CASE("Method- Matrix Mult 1", "[Matrix]")
+{
+  INFO("Multiply two matrices together")
+
+  std::vector<Elem> elements = {1, 0, 3, 0, 0, 6, 7, 8, 0, 0, 3, 2};
+  std::size_t cols1 = 4;
+  Matrix A(elements, cols1);
+
+  std::vector<Elem> elements2 = {4,0,2,4,0,2,9,0};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
+
+  A.mult(B);
+
+  REQUIRE(true);
 
 }

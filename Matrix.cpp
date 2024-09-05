@@ -220,6 +220,50 @@ Matrix Matrix::sub(const Matrix &rhs) const {
 }
 
   Matrix Matrix::mult( const Matrix &rhs ) const{
+    // TODO: add logic for invalid multiplication
+
+    //resultant matrix in Row-Major order
+    std::vector<size_t> mult_result((row_ind.size()-1) * rhs.n, 0);
+
+    for (std::size_t i = 0; i < row_ind.size()-1; i++){
+      int row_start = row_ind[i];
+      int row_end = row_ind[i+1];
+
+      // buffers for multiplication operation
+      std::vector<int> matrix1_row(n, 0);
+      std::vector<int> matrix2_column(rhs.row_ind.size()-1,0);
+
+      int column_index = 0;
+
+      //update corresponding values in row buffer based on CSR
+      while(row_start != row_end){
+        if (col_ind[row_start] == column_index){
+           matrix1_row[column_index] = elements[row_start];
+           row_start++;
+        }
+        column_index++;
+      }
+
+      int rhs_column_index = 0;
+      int matrix2_column_pos = 0;
+
+      // build vector of columns
+      for(std::size_t j = 0; j < rhs.row_ind.size()-1; j++){
+        int rhs_row_start = rhs.row_ind[j];
+        int rhs_row_end = rhs.row_ind[j+1];
+        //if the non-zero element is present at the column index, add it to the column vector
+        if(rhs.col_ind[rhs_row_start] == rhs_column_index){
+          matrix2_column[matrix2_column_pos] = rhs.elements[rhs_row_start];
+        }
+        // increment matrix2_column index to next item
+        matrix2_column_pos++;
+      }
+      
+      // look at next column in rhs matrix on next loop iteration
+      rhs_column_index++;
+
+    }
+    
     return Matrix();
   }
   Matrix Matrix::mult( Scalar k ) const{
