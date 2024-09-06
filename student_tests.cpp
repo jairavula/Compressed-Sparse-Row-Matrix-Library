@@ -58,7 +58,6 @@ TEST_CASE( "Parameterized constructor 2", "[Matrix]" )
 
   REQUIRE(A.equal(A));
   
-  std::cout << A << std::endl;
 }
 
 // TEST_CASE( "Parameterized constructor 3", "[Matrix]" )
@@ -323,11 +322,8 @@ TEST_CASE("Method- Matrix Mult Scalar 1", "[Matrix]")
   std::size_t cols2 = 4;
   Matrix B(elements2, cols2);
 
-  std::cout << B << std::endl;
-
   Matrix C = A.mult(2);
 
-  std::cout << C << std::endl;
 
   // std::cout << C << std::endl
 
@@ -371,4 +367,39 @@ TEST_CASE("Method- Matrix Transpose", "[Matrix]")
   Matrix C = A.trans();
 
   REQUIRE(C.equal(B));
+}
+
+// TEST_CASE( "Method Row Switch 1", "[Matrix]" )
+// {
+//   INFO("Hint: Switch (swap) rows within the matrix (in-place operation)");
+//   std::vector<Elem> elements = {1,2,3,4};
+//   std::size_t cols = 2;
+//   Matrix A(elements, cols);
+
+//   std::vector<Elem> elements2 = {3,4,1,2};
+//   std::size_t cols2 = 2;
+//   Matrix B(elements2, cols2);
+
+//   A.rowSwitch(1,2);
+
+//   std::cout << A << std::endl;
+//   std::cout << B << std::endl;
+
+  
+//   REQUIRE(A.equal(B));
+// }
+
+TEST_CASE( "Method row mult 1", "[Matrix]" )
+{
+  std::vector<Elem> elements = {1,2,3,4};
+  std::size_t cols = 2;
+  Matrix A(elements, cols);
+
+  std::vector<Elem> elements2 = {3,6,3,4};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
+
+  A.rowMult(1,3);
+  
+  REQUIRE(A.equal(B));
 }
