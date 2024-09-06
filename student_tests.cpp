@@ -27,8 +27,6 @@ TEST_CASE( "Default constructor", "[Matrix]" )
   for(i = 0; i < 2; i++)
     for(j = 0; j < 2; j++)
       REQUIRE(A.e(i,j) == 0);
-
-  std::cout << A << std::endl;
 }
 
 /** 
@@ -60,15 +58,15 @@ TEST_CASE( "Parameterized constructor 2", "[Matrix]" )
   
 }
 
-// TEST_CASE( "Parameterized constructor 3", "[Matrix]" )
-// {
-//   INFO("Hint: Use the parameters to set the matrix elements, array");
-//   Elem elements[4] = {1, 0, 0, 1};
+TEST_CASE( "Parameterized constructor 3", "[Matrix]" )
+{
+  INFO("Hint: Use the parameters to set the matrix elements, array");
+  Elem elements[4] = {1, 0, 0, 1};
 
-//   Matrix A(elements,2,2);
+  Matrix A(elements,2,2);
 
-//   REQUIRE(A.equal(A));
-// }
+  REQUIRE(A.equal(A));
+}
 
 TEST_CASE( "Element get", "[Matrix]" )
 {
@@ -221,6 +219,19 @@ TEST_CASE("My 2nd Constructor", "[Matrix]"){
   
 }
 
+TEST_CASE( "My 3rd constructor", "[Matrix]" )
+{
+  INFO("Hint: Use the parameters to set the matrix elements, array");
+  Elem elements[4] = {1, 0, 0, 1};
+  std::vector<Elem> elements2 = {1,0,0,1};
+
+
+  Matrix A(elements,2,2);
+  Matrix B(elements2, 2);
+
+  REQUIRE(A.equal(B));
+}
+
 TEST_CASE("My Method equal", "[Matrix]")
 {
   INFO("Check if two matrices are equal to each other")
@@ -325,8 +336,6 @@ TEST_CASE("Method- Matrix Mult Scalar 1", "[Matrix]")
   Matrix C = A.mult(2);
 
 
-  // std::cout << C << std::endl
-
   REQUIRE(C.equal(B));
 
 }
@@ -369,25 +378,22 @@ TEST_CASE("Method- Matrix Transpose", "[Matrix]")
   REQUIRE(C.equal(B));
 }
 
-// TEST_CASE( "Method Row Switch 1", "[Matrix]" )
-// {
-//   INFO("Hint: Switch (swap) rows within the matrix (in-place operation)");
-//   std::vector<Elem> elements = {1,2,3,4};
-//   std::size_t cols = 2;
-//   Matrix A(elements, cols);
+TEST_CASE( "Method Row Switch 1", "[Matrix]" )
+{
+  INFO("Hint: Switch (swap) rows within the matrix (in-place operation)");
+  std::vector<Elem> elements = {1,2,3,4};
+  std::size_t cols = 2;
+  Matrix A(elements, cols);
 
-//   std::vector<Elem> elements2 = {3,4,1,2};
-//   std::size_t cols2 = 2;
-//   Matrix B(elements2, cols2);
+  std::vector<Elem> elements2 = {3,4,1,2};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
 
-//   A.rowSwitch(1,2);
-
-//   std::cout << A << std::endl;
-//   std::cout << B << std::endl;
+  A.rowSwitch(1,2);
 
   
-//   REQUIRE(A.equal(B));
-// }
+  REQUIRE(A.equal(B));
+}
 
 TEST_CASE( "Method row mult 1", "[Matrix]" )
 {
@@ -401,5 +407,26 @@ TEST_CASE( "Method row mult 1", "[Matrix]" )
 
   A.rowMult(1,3);
   
+  REQUIRE(A.equal(B));
+}
+
+TEST_CASE( "Method row add 1", "[Matrix]" )
+{
+  INFO("Hint: Replace a row with the sum of itself and the scalar multiple of another row (in-place operation)");
+  std::vector<Elem> elements = {1,2,3,4};
+  std::size_t cols = 2;
+  Matrix A(elements, cols);
+
+  std::vector<Elem> elements2 = {1,2,5,8};
+  std::size_t cols2 = 2;
+  Matrix B(elements2, cols2);
+
+  A.rowAdd(2,1,2);
+
+  std::cout << A << std::endl;
+  std::cout << B << std::endl;
+
+
+
   REQUIRE(A.equal(B));
 }

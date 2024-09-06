@@ -32,15 +32,25 @@ Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind()
   }
 };
 
-//  /**
-//  * Another parameterized constructor.  Use the parameters to set the matrix element; if parameters are inconsistent then create a 0-by-0 (empty) matrix.
-//  * @param ptr_A - pointer to a dense, row-major order array of matrix elements
-//  * @param m - number of rows for the new matrix.
-//  * @param n - number of columns for the new matrix.
-//  */
-// Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n) : n(n){
+Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n) : elements(), col_ind(), n(n), row_ind(m + 1, 0) {
+    if (m == 0 || n == 0) {
+        elements.clear();
+        col_ind.clear();
+        row_ind.clear();
+        return;
+    }
 
-// }
+    for (std::size_t row = 0; row < m; row++) {
+        for (std::size_t col = 0; col < n; col++) {
+            Elem value = ptr_A[row * n + col];  
+            if (value != 0) {
+                elements.push_back(value);  
+                col_ind.push_back(col);     
+            }
+        }
+        row_ind[row + 1] = elements.size(); 
+    }
+}
 
 Elem Matrix::e(std::size_t i, std::size_t j) const
 {
@@ -421,53 +431,32 @@ Matrix Matrix::trans() const
 
 
 // TODO: NOT WORKING
-bool Matrix::rowSwitch(std::size_t i, std::size_t j)
-{
+bool Matrix::rowSwitch(std::size_t i, std::size_t j) {
 
-  if (elements.size() == 0)
-  {
+  if(row_ind.size() <= 2 || elements.size() <= 1) {
     return false;
   }
+    int row1_start = row_ind[i - 1];
+    int row1_end = row_ind[i];
+    int row2_start = row_ind[j - 1];
+    int row2_end = row_ind[j];
 
-  std::vector<Elem> row1;
-  std::vector<Elem> row2;
+    if (row1_start == row1_end && row2_start == row2_end) {
+        return false;  
+    }
 
-  std::vector<std::size_t> row1_cols;
-  std::vector<std::size_t> row2_cols;
+    std::swap_ranges(elements.begin() + row1_start, elements.begin() + row1_end, elements.begin() + row2_start);
+    std::swap_ranges(col_ind.begin() + row1_start, col_ind.begin() + row1_end, col_ind.begin() + row2_start);
 
-  int row1_start = row_ind[i - 1];
-  int row1_end = row_ind[i];
+    int row1_size = row1_end - row1_start;
+    int row2_size = row2_end - row2_start;
 
-  int row2_start = row_ind[j - 1];
-  int row2_end = row_ind[j];
+    if (row1_size != row2_size) {
+        row_ind[i] = row_ind[i - 1] + row2_size;
+        row_ind[j] = row_ind[j - 1] + row1_size;
+    }
 
-  for (int i = row1_start; i < row1_end; i++)
-  {
-    row1.push_back(elements[i]);
-    row1_cols.push_back(col_ind[i]);
-  }
-
-  for (int j = row1_start; j < row1_end; j++)
-  {
-    row1.push_back(elements[j]);
-    row1_cols.push_back(col_ind[j]);
-  }
-
-  elements.erase(elements.begin() + row1_start, elements.begin() + row1_end);
-  col_ind.erase(col_ind.begin() + row1_start, col_ind.begin() + row1_end);
-
-  elements.insert(elements.begin() + row1_start, row2.begin(), row2.end());
-  col_ind.insert(col_ind.begin() + row1_start, row2_cols.begin(), row2_cols.end());
-
-  int new_row2_start = row2_start + (row2.size() - row1.size());
-
-  elements.erase(elements.begin() + new_row2_start, elements.begin() + new_row2_start + row2.size());
-  col_ind.erase(col_ind.begin() + new_row2_start, col_ind.begin() + new_row2_start + row2.size());
-
-  elements.insert(elements.begin() + new_row2_start, row1.begin(), row1.end());
-  col_ind.insert(col_ind.begin() + new_row2_start, row1_cols.begin(), row1_cols.end());
-
-  return true;
+    return true;
 }
 
 bool Matrix::rowMult(std::size_t i, Scalar k)
@@ -503,15 +492,68 @@ bool Matrix::rowMult(std::size_t i, Scalar k)
   return true;
 }
 
-bool Matrix::rowAdd(std::size_t i, std::size_t j, Scalar k)
-{
-  return true;
+bool Matrix::rowAdd(std::size_t i, std::size_t j, Scalar k) {
+
+  if(row_ind.size() <= 2 || elements.size() <= 1) {
+    return false;
+  }
+
+
+    int dest_row_start = row_ind[i - 1];  
+    int dest_row_end = row_ind[i];       
+
+    int row_start = row_ind[j - 1];      
+    int row_end = row_ind[j];            
+
+    std::vector<Elem> dest_row(n, 0);
+    std::vector<Elem> src_row(n, 0);
+
+    for (int l = dest_row_start; l < dest_row_end; l++) {
+        dest_row[col_ind[l]] = elements[l];
+    }
+
+    for (int m = row_start; m < row_end; m++) {
+        src_row[col_ind[m]] = elements[m] * k;
+    }
+
+    for (int o = 0; o < n; o++) {
+        dest_row[o] += src_row[o];
+    }
+
+    // erase old destination row from the matrix
+    elements.erase(elements.begin() + dest_row_start, elements.begin() + dest_row_end);
+    col_ind.erase(col_ind.begin() + dest_row_start, col_ind.begin() + dest_row_end);
+
+    // insert the updated row into the matrix (only non-zero elements)
+    int insert_pos = dest_row_start;
+    for (std::size_t col = 0; col < n; col++) {
+        if (dest_row[col] != 0) {  // Only insert non-zero values
+            elements.insert(elements.begin() + insert_pos, dest_row[col]);
+            col_ind.insert(col_ind.begin() + insert_pos, col);
+            insert_pos++;
+        }
+    }
+
+    // adjust row_ind if the row size changes
+    int new_row_size = insert_pos - dest_row_start;
+    int old_row_size = dest_row_end - dest_row_start;
+    int size_difference = new_row_size - old_row_size;
+
+    for (std::size_t r = i; r < row_ind.size(); r++) {
+        row_ind[r] += size_difference;
+    }
+
+    return true; 
 }
 
 Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const
 {
   return Matrix();
 }
+
+
+
+
 
 // You'll implement this method in part two of the project
 Matrix Matrix::invMod(Scalar m) const
