@@ -308,29 +308,47 @@ Matrix Matrix::mult(Scalar k) const {
 
   Matrix Matrix::trans() const{
 
+    //return empty matrix with same dim as original if matrix is all zero
+    if(elements.size() == 0){
+      return *this;
+    }
 
+    // element buffer used for matrix reconstruction
+    std::vector<Elem> transpose_elems(elements.size()); 
+    int transpose_elems_index = 0;
+
+    //grab each column out of the matrix
     for(std::size_t col = 0; col < n; col++){
 
-        std::vector<int> matrix_column(row_ind.size()-1,0);
-        int matrix_column_pos = 0;
+        //column buffer
+        std::vector<int> matrix2_column(row_ind.size()-1,0);
+        int matrix2_column_pos = 0;
+
 
         // build vector of columns
-        for(std::size_t j = 0; j < row_ind.size(); j++){
+        for(std::size_t j = 0; j < row_ind.size()-1; j++){
           int row_start = row_ind[j];
           int row_end = row_ind[j+1];
           while(row_start != row_end){
             //if the non-zero element is present at the column index, add it to the column vector  
             if(col_ind[row_start] == col){
-            matrix_column[matrix_column_pos] = elements[row_start];
+            matrix2_column[matrix2_column_pos] = elements[row_start];
             }
             row_start++;
           }
           // increment matrix2_column index to next item
-          matrix_column_pos++;
+          matrix2_column_pos++;
+        }
+        // "push back" columns as rows in new elements buffer
+        for(int k = 0; k < matrix2_column.size(); k++){
+          transpose_elems[transpose_elems_index] = matrix2_column[k];
+          transpose_elems_index++;
         }
       }
+      //reconstruct transpose matrix
+      Matrix A = Matrix(transpose_elems, row_ind.size()-1);
 
-    return Matrix();
+    return A;
   }
 
 

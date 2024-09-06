@@ -123,26 +123,26 @@ TEST_CASE( "Method sub", "[Matrix]" )
   REQUIRE(A.equal(A));
 }
 
-// TEST_CASE( "Method matrix mult", "[Matrix]" )
-// {
-//   INFO("Hint: Multiplication of matrices");
-//   Matrix A, B, C;
+TEST_CASE( "Method matrix mult", "[Matrix]" )
+{
+  INFO("Hint: Multiplication of matrices");
+  Matrix A, B, C;
 
-//   A = B.mult(C);
+  A = B.mult(C);
   
-//   REQUIRE(A.equal(A));
-// }
+  REQUIRE(A.equal(A));
+}
 
-// TEST_CASE( "Method scalar mult", "[Matrix]" )
-// {
-//   INFO("Hint: Multiplication of matrix by a scalar");
-//   Matrix A;
-//   Scalar k = 1;
+TEST_CASE( "Method scalar mult", "[Matrix]" )
+{
+  INFO("Hint: Multiplication of matrix by a scalar");
+  Matrix A;
+  Scalar k = 1;
 
-//   A = A.mult(k);
+  A = A.mult(k);
   
-//   REQUIRE(A.equal(A));
-// }
+  REQUIRE(A.equal(A));
+}
 
 TEST_CASE( "Method pow", "[Matrix]" )
 {
@@ -359,11 +359,16 @@ TEST_CASE("Method- Matrix Transpose", "[Matrix]")
 {
   INFO("Return the transpose of a matrix")
 
-  std::vector<Elem> elements2 = {1,2,3,4};
+  std::vector<Elem> elements = {1,2,3,4};
+  std::size_t cols = 2;
+  Matrix A(elements, cols);
+
+  std::vector<Elem> elements2 = {1,3,2,4};
   std::size_t cols2 = 2;
   Matrix B(elements2, cols2);
 
-  Matrix A = B.trans();
 
-  REQUIRE(true);
+  Matrix C = A.trans();
+
+  REQUIRE(C.equal(B));
 }
