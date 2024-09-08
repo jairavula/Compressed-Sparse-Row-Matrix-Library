@@ -7,10 +7,20 @@
 // Default constructor
 Matrix::Matrix() : elements(), col_ind(), row_ind(3), n(2) {}
 
-Matrix::Matrix(std::size_t m, std::size_t n) : elements(), col_ind(), row_ind(m + 1, 0), n(n) {};
+Matrix::Matrix(std::size_t m, std::size_t n) : elements(), col_ind(),
+ row_ind((m == 0 || n == 0) ? std::vector<std::size_t>(1, 0) : std::vector<std::size_t>(m + 1, 0)), n((m == 0) ? 0 : n) {};
 
-Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n(n), row_ind()
+Matrix::Matrix(const std::vector<Elem> &A, std::size_t n) : n((A.size() == 0 || n == 0 || A.size() % n != 0) ? 0 : n), row_ind()
 {
+
+if (n == 0 || A.size() % n != 0) {
+        // Invalid dimensions, set matrix to 0x0
+        elements.clear();
+        col_ind.clear();
+        row_ind.clear();
+        row_ind.push_back(0);  // Ensures row_ind has at least one value (0)
+        return;
+    }
 
   std::size_t nonzero_elements = 0;
   row_ind.push_back(0);
@@ -58,7 +68,11 @@ Elem Matrix::e(std::size_t i, std::size_t j) const
   // 2. Iterate through the column index using the possible entry indices from the row index
   // 3. Look for a column index matching j
 
-  if (i < row_ind.size() - 1)
+  if (i >= row_ind.size() - 1 || j >= n) {
+        return std::numeric_limits<Elem>::min();
+    }
+
+  if (i < row_ind.size() - 1 && i >= 0)
   {
     for (std::size_t index = row_ind[i]; index < row_ind[i + 1]; index++)
     {
@@ -68,7 +82,6 @@ Elem Matrix::e(std::size_t i, std::size_t j) const
       }
     }
   }
-  // return 0 if value not found
   return 0;
 }
 
@@ -524,10 +537,10 @@ bool Matrix::rowAdd(std::size_t i, std::size_t j, Scalar k) {
     elements.erase(elements.begin() + dest_row_start, elements.begin() + dest_row_end);
     col_ind.erase(col_ind.begin() + dest_row_start, col_ind.begin() + dest_row_end);
 
-    // insert the updated row into the matrix (only non-zero elements)
+    // insert the updated row into the matrix
     int insert_pos = dest_row_start;
     for (std::size_t col = 0; col < n; col++) {
-        if (dest_row[col] != 0) {  // Only insert non-zero values
+        if (dest_row[col] != 0) { 
             elements.insert(elements.begin() + insert_pos, dest_row[col]);
             col_ind.insert(col_ind.begin() + insert_pos, col);
             insert_pos++;
@@ -548,8 +561,40 @@ bool Matrix::rowAdd(std::size_t i, std::size_t j, Scalar k) {
 
 Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const
 {
+
+  std::vector<Elem> new_elements;
+  std::vector<Elem> new_col_ind;
+  std::vector<Elem> new_row_ind;
+
+
+
+
+  if (dim == 1 && n == rhs.n){
+    for(int i = 0; i < elements.size(); i++) {
+      new_elements.push_back(elements[i]);
+      new_col_ind.push_back(col_ind[i]);
+    }
+    for(int i = 0; i < rhs.elements.size(); i++) {
+      new_elements.push_back(rhs.elements[i]);
+      new_col_ind.push_back(rhs.col_ind[i]);
+    }
+    for(int i = 0; i < row_ind.size(); i++) {
+      new_row_ind.push_back(row_ind[i]);
+    }
+    for(int i = 0; i < rhs.row_ind.size(); i++) {
+      new_row_ind.push_back(row_ind[i] + elements.size());
+    }
+ 
+  }
+  else if (dim ==2 && row_ind.size() == rhs.row_ind.size()){
+
+  }
+  else {
+
+  }
   return Matrix();
 }
+
 
 
 
