@@ -72,7 +72,7 @@ Elem Matrix::e(std::size_t i, std::size_t j) const
 
   // return minimum value if invalid index
   if (i >= row_ind.size() - 1 || j >= n) {
-        return std::numeric_limits<Elem>::min();
+        return std::numeric_limits<int>::min();
     }
 
   if (i < row_ind.size() - 1 && i >= 0)
