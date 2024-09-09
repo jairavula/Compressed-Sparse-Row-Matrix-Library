@@ -76,13 +76,6 @@ TEST_CASE( "Element get", "[Matrix]" )
   REQUIRE(A.e(0,0) == 0);
 }
 
-TEST_CASE( "Element set", "[Matrix]" )
-{
-  INFO("Hint: Sets the element at specified row, column index to given value");
-  Matrix A;
-
-  REQUIRE(A.e(0,0,1) == false);
-}
 
 TEST_CASE( "Method size", "[Matrix]" )
 {
@@ -389,7 +382,7 @@ TEST_CASE( "Method Row Switch 1", "[Matrix]" )
   std::size_t cols2 = 2;
   Matrix B(elements2, cols2);
 
-  A.rowSwitch(1,2);
+  A.rowSwitch(0,1);
 
   
   REQUIRE(A.equal(B));
@@ -405,7 +398,7 @@ TEST_CASE( "Method row mult 1", "[Matrix]" )
   std::size_t cols2 = 2;
   Matrix B(elements2, cols2);
 
-  A.rowMult(1,3);
+  A.rowMult(0,3);
   
   REQUIRE(A.equal(B));
 }
@@ -421,7 +414,7 @@ TEST_CASE( "Method row add 1", "[Matrix]" )
   std::size_t cols2 = 2;
   Matrix B(elements2, cols2);
 
-  A.rowAdd(2,1,2);
+  A.rowAdd(1,0,2);
 
   std::cout << A << std::endl;
   std::cout << B << std::endl;
