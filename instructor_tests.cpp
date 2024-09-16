@@ -775,11 +775,17 @@ TEST_CASE( "Method rowAdd2", "[Matrix]" )
 TEST_CASE( "Inverse Modular", "[Matrix]" )
 {
   INFO("Test invmod function");
-  std::vector<Elem> elements = {1,2,3,4};
-  std::size_t cols = 2;
+  std::vector<Elem> elements = {1,2,3,5,4,7,6,3,7,8,0,3,3,5,2,4};
+  std::size_t cols = 4;
   Matrix A(elements, cols);
 
-  A.invMod(7);
+  std::vector<Elem> elements2 = {2,4,1,6,5,0,4,3,3,1,1,0,3,0,6,6};
+  Matrix B(elements2, cols);
 
-  REQUIRE(true);
+  Matrix C = A.invMod(7);
+
+  std::cout << B << std::endl;
+  std::cout << C << std::endl;
+
+  REQUIRE(C.equal(B));
 }

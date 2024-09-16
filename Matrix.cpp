@@ -697,119 +697,119 @@ Matrix Matrix::cat(const Matrix &rhs, std::size_t dim) const
 
 
 
-// You'll implement this method in part two of the project
-Matrix Matrix::invMod(Scalar m) const
-{
-  Matrix Identity(row_ind.size()-1, row_ind.size()-1);
-  for (std::size_t i = 0; i < m; ++i) {
-        Identity.elements.push_back(1);   // Elements on the diagnol are 1
-        Identity.col_ind.push_back(i);    // Column index is the same as the row index
-        Identity.row_ind[i + 1] = i + 1;  //  Increment by 1 after every row
+Matrix Matrix::invMod(Scalar m) const {
+
+    // Create a copy of the original matrix
+    Matrix originalMatrix(*this); 
+
+    // Identity matrix to store the inverse
+    Matrix inverseMatrix(n, n);
+    for (std::size_t i = 0; i < n; ++i) {
+        inverseMatrix.elements.push_back(1);
+        inverseMatrix.col_ind.push_back(i);
+        inverseMatrix.row_ind[i + 1] = i + 1;
     }
 
-  Matrix AugmentedMatrix = this->cat(Identity, 2);
-  std::cout << AugmentedMatrix << std::endl;
+    // Perform Gaussian elimination on both matrices simultaneously
+    for (std::size_t i = 0; i < n; ++i) {
+        // Finds the pivot element in the current row
+        std::size_t pivot_index = -1;
+        for (std::size_t j = originalMatrix.row_ind[i]; j < originalMatrix.row_ind[i + 1]; ++j) {
+            if (originalMatrix.col_ind[j] == i && originalMatrix.elements[j] != 0) {
+                pivot_index = j;
+                break;
+            }
+        }
+        // No pivot on row means singular matrix
+        if (pivot_index == -1) {
+            std::cout << "Pivot not found or matrix is singular!" << std::endl;
+            return Matrix(0, 0); 
+        }
+        // Get the inverse of the pivot value
+        Elem pivot_value = originalMatrix.elements[pivot_index];
+        Elem pivot_inverse = originalMatrix.modularInverse(pivot_value, m);
+        if (pivot_inverse == -1) {
+            std::cout << "Modular inverse doesn't exist for pivot!" << std::endl;
+            return Matrix(0, 0);
+        }
 
-  for (std::size_t i = 0; i < AugmentedMatrix.row_ind.size() - 1; ++i) {
-    std::size_t pivot_index = -1;
-    // Step 1: Find the pivot element in the current row
-    for (int j = AugmentedMatrix.row_ind[i]; j < AugmentedMatrix.row_ind[i+1]; j++) {
-        if (AugmentedMatrix.elements[j] != 0 && AugmentedMatrix.col_ind[j] == i) {  // Check column index matches
-            pivot_index = j;
-            std::cout << "Pivot found at index: " << pivot_index << " in column " << i << std::endl;
-            break;
+        // Normalize the pivot row in both matrices
+        originalMatrix.rowMult(i, pivot_inverse);
+        inverseMatrix.rowMult(i, pivot_inverse);
+
+        // Apply mod m to the elements in both matrices
+        for (std::size_t j = originalMatrix.row_ind[i]; j < originalMatrix.row_ind[i + 1]; ++j) {
+            originalMatrix.elements[j] = (originalMatrix.elements[j] % m + m) % m;
+        }
+        for (std::size_t j = inverseMatrix.row_ind[i]; j < inverseMatrix.row_ind[i + 1]; ++j) {
+            inverseMatrix.elements[j] = (inverseMatrix.elements[j] % m + m) % m;
+        }
+
+        // Eliminate the elements below the pivot in the same column
+        for (std::size_t row = i + 1; row < n; ++row) {
+            Elem element_below_pivot = 0;
+            for (std::size_t j = originalMatrix.row_ind[row]; j < originalMatrix.row_ind[row + 1]; ++j) {
+                if (originalMatrix.col_ind[j] == i) {
+                    element_below_pivot = originalMatrix.elements[j];
+                    break;
+                }
+            }
+
+            // Only perform row operation if element is nonzero in pivot column
+            if (element_below_pivot != 0) {
+                Elem factor = element_below_pivot;
+                originalMatrix.rowAdd(row, i, (-factor % m + m) % m);
+                inverseMatrix.rowAdd(row, i, (-factor % m + m) % m);
+                // Apply the modulus scaling
+                for (std::size_t j = originalMatrix.row_ind[row]; j < originalMatrix.row_ind[row + 1]; ++j) {
+                    originalMatrix.elements[j] = (originalMatrix.elements[j] % m + m) % m;
+                }
+                for (std::size_t j = inverseMatrix.row_ind[row]; j < inverseMatrix.row_ind[row + 1]; ++j) {
+                    inverseMatrix.elements[j] = (inverseMatrix.elements[j] % m + m) % m;
+                }
+            }
         }
     }
-    Elem pivot_value = AugmentedMatrix.elements[pivot_index];  // The pivot element
-    Elem pivot_inverse = AugmentedMatrix.modularInverse(pivot_value, m); 
-    
-    if (pivot_value == 0 || pivot_inverse == -1) {
-    std::cout << "Pivot is zero or has no modular inverse, matrix is not invertible!" << std::endl;
-    return Matrix(0, 0);  // Return an empty matrix to indicate non-invertibility
+
+    // Eliminate elements above the pivot in the same column
+    for (std::size_t i = n; i-- > 0;) {
+        for (std::size_t row = i; row-- > 0;) {
+            Elem element_above_pivot = 0;
+            for (std::size_t j = originalMatrix.row_ind[row]; j < originalMatrix.row_ind[row + 1]; ++j) {
+                if (originalMatrix.col_ind[j] == i) {
+                    element_above_pivot = originalMatrix.elements[j];
+                    break;
+                }
+            }
+            // Only perform row operation if element is nonzero in pivot column            
+            if (element_above_pivot != 0) {
+                Elem factor = element_above_pivot;
+                originalMatrix.rowAdd(row, i, (-factor % m + m) % m);
+                inverseMatrix.rowAdd(row, i, (-factor % m + m) % m);
+            // Apply the modulus scaling
+                for (std::size_t j = originalMatrix.row_ind[row]; j < originalMatrix.row_ind[row + 1]; ++j) {
+                    originalMatrix.elements[j] = (originalMatrix.elements[j] % m + m) % m;
+                }
+                for (std::size_t j = inverseMatrix.row_ind[row]; j < inverseMatrix.row_ind[row + 1]; ++j) {
+                    inverseMatrix.elements[j] = (inverseMatrix.elements[j] % m + m) % m;
+                }
+            }
+        }
+    }
+
+    // Reconstruct Inverse Matrix without unecessary zero entries in elements
+    std::vector<Elem> rowMajor;
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            rowMajor.push_back(inverseMatrix.e(i,j));
+        }
+    }
+    Matrix cleanedInverseMatrix(rowMajor, n);
+
+    // Return the updated inverse matrix
+    return cleanedInverseMatrix;  
 }
 
-    AugmentedMatrix.rowMult(i,pivot_inverse);
-
-    for (int j = AugmentedMatrix.row_ind[i]; j < AugmentedMatrix.row_ind[i+1]; j++) {
-        AugmentedMatrix.elements[j] = AugmentedMatrix.elements[j] % m;
-    }
-
-    std::cout << AugmentedMatrix << std::endl;
-
-   // Perform elimination below the pivot row
-for (std::size_t row = i + 1; row < AugmentedMatrix.row_ind.size() - 1; ++row) {
-    std::size_t row_start = AugmentedMatrix.row_ind[row];
-    std::size_t row_end = AugmentedMatrix.row_ind[row + 1];
-
-    Elem element_below_pivot = -1;
-
-    // Find the element in the same column as the pivot (pivot column = i)
-    for (std::size_t j = row_start; j < row_end; ++j) {
-        if (AugmentedMatrix.col_ind[j] == i) {  // Find element in the pivot column
-            element_below_pivot = AugmentedMatrix.elements[j];
-            break;
-        }
-    }
-
-    // If there's a non-zero element below the pivot, perform row elimination
-    if (element_below_pivot != -1 && element_below_pivot != 0) {
-        Elem factor = element_below_pivot;
-
-        // Subtract factor * pivot row from the current row using rowAdd
-        AugmentedMatrix.rowAdd(row, i, (-factor % m + m) % m);  // Eliminate below the pivot
-
-        // Ensure all elements in the current row are reduced modulo m
-        std::size_t new_row_start = AugmentedMatrix.row_ind[row];
-        std::size_t new_row_end = AugmentedMatrix.row_ind[row + 1];
-
-        for (std::size_t j = new_row_start; j < new_row_end; ++j) {
-            AugmentedMatrix.elements[j] = (AugmentedMatrix.elements[j] % m + m) % m;
-        }
-
-        // Double check row after elimination and mod operation
-        std::cout << "Row " << row << " after row elimination and mod m: " << AugmentedMatrix << std::endl;
-    }
-}
-// Eliminate elements above the pivot
-for (std::size_t row = i; row-- > 0;) {  // Work upwards
-    std::size_t row_start = row_ind[row];
-    std::size_t row_end = row_ind[row + 1];
-
-    Elem element_above_pivot = -1;
-
-    // Find the element in the same column as the pivot (pivot column = i)
-    for (std::size_t j = row_start; j < row_end; ++j) {
-        if (AugmentedMatrix.col_ind[j] == i) {  // Find element in the pivot column
-            element_above_pivot = AugmentedMatrix.elements[j];
-            break;
-        }
-    }
-
-    // If there's a non-zero element above the pivot, perform row elimination
-    if (element_above_pivot != -1 && element_above_pivot != 0) {
-        Elem factor = element_above_pivot;
-
-        // Subtract factor * pivot row from the current row using rowAdd
-        std::cout << "Performing rowAdd on row " << row << " with factor: " << factor << std::endl;
-        AugmentedMatrix.rowAdd(row, i, (-factor % m + m) % m);  // Eliminate above the pivot
-
-        // Ensure all elements in the current row are reduced modulo m
-        std::size_t new_row_start = AugmentedMatrix.row_ind[row];
-        std::size_t new_row_end = AugmentedMatrix.row_ind[row + 1];
-
-        for (std::size_t j = new_row_start; j < new_row_end; ++j) {
-            AugmentedMatrix.elements[j] = (AugmentedMatrix.elements[j] % m + m) % m;
-        }
-
-        // Output the current state of the row after elimination
-        std::cout << "Row " << row << " after row elimination and mod m: " << AugmentedMatrix << std::endl;
-    }
-}
-  }
-  Matrix inverse = AugmentedMatrix.extractInverse(n);  // n is the size of the original matrix
-std::cout << inverse << std::endl;
-  return Matrix();
-}
 
 int Matrix::extendedEuclidean(int a, int m, int &x, int &y) {
     if (a == 0) {
@@ -840,23 +840,28 @@ int Matrix::modularInverse(int a, int m) {
 
 Matrix Matrix::extractInverse(std::size_t n) const {
     Matrix inverseMatrix(n, n);  // Create a new matrix to hold the inverse
+    inverseMatrix.row_ind[0] = 0;  // Initialize the first row_ind
+
+    // Iterate over rows of the augmented matrix
     for (std::size_t i = 0; i < n; ++i) {
         std::size_t row_start = row_ind[i];
         std::size_t row_end = row_ind[i + 1];
 
-        // Loop through each row in the augmented matrix
+        // Iterate over the non-zero elements in the current row
         for (std::size_t j = row_start; j < row_end; ++j) {
-            // Check if the column is in the range of the right-hand side
-            if (col_ind[j] >= n && col_ind[j] < 2 * n) {
-                // Adjust the column index to fit into the inverse matrix
-                std::size_t inverse_col = col_ind[j] - n;
+            std::size_t col = col_ind[j];
+            // Only extract the right half (the inverse part)
+            if (col >= n && col < 2 * n) {
+                // Calculate the inverse column index
+                std::size_t inverse_col = col - n;
                 inverseMatrix.elements.push_back(elements[j]);
                 inverseMatrix.col_ind.push_back(inverse_col);
             }
         }
-        // Update the row index for the inverse matrix
+        // Set the row_ind of the inverse matrix
         inverseMatrix.row_ind[i + 1] = inverseMatrix.elements.size();
     }
+
     return inverseMatrix;
 }
 
