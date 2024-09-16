@@ -192,5 +192,9 @@ private:
                                     //rows zero to i-1)), remember this should have an extra entry at the end of the vector where
                                     //we store the total number of non-zero entries in elements
   //Feel free to add your own private methods below
+
+  int extendedEuclidean(int a, int m, int &x, int &y);
+  int modularInverse(int a, int m);
+  Matrix extractInverse(std::size_t n)const;
 };
 #endif

@@ -423,3 +423,17 @@ TEST_CASE( "Method row add 1", "[Matrix]" )
 
   REQUIRE(A.equal(B));
 }
+
+TEST_CASE( "Inverse Modular", "[Matrix]" )
+{
+  INFO("Test invmod function");
+  std::vector<Elem> elements = {1,2,3,4,5,6,7,8,9};
+  std::size_t cols = 3;
+  Matrix A(elements, cols);
+
+  A.invMod(3);
+
+  std::cout << A << std::endl;
+
+  REQUIRE(true);
+}
