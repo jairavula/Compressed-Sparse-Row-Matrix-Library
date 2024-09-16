@@ -195,6 +195,5 @@ private:
 
   int extendedEuclidean(int a, int m, int &x, int &y);
   int modularInverse(int a, int m);
-  Matrix extractInverse(std::size_t n)const;
 };
 #endif

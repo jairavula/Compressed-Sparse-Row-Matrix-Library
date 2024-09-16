@@ -838,33 +838,6 @@ int Matrix::modularInverse(int a, int m) {
     }
 }
 
-Matrix Matrix::extractInverse(std::size_t n) const {
-    Matrix inverseMatrix(n, n);  // Create a new matrix to hold the inverse
-    inverseMatrix.row_ind[0] = 0;  // Initialize the first row_ind
-
-    // Iterate over rows of the augmented matrix
-    for (std::size_t i = 0; i < n; ++i) {
-        std::size_t row_start = row_ind[i];
-        std::size_t row_end = row_ind[i + 1];
-
-        // Iterate over the non-zero elements in the current row
-        for (std::size_t j = row_start; j < row_end; ++j) {
-            std::size_t col = col_ind[j];
-            // Only extract the right half (the inverse part)
-            if (col >= n && col < 2 * n) {
-                // Calculate the inverse column index
-                std::size_t inverse_col = col - n;
-                inverseMatrix.elements.push_back(elements[j]);
-                inverseMatrix.col_ind.push_back(inverse_col);
-            }
-        }
-        // Set the row_ind of the inverse matrix
-        inverseMatrix.row_ind[i + 1] = inverseMatrix.elements.size();
-    }
-
-    return inverseMatrix;
-}
-
 // Instructor provided methods and functions below; do not modify
 Matrix::Matrix(const Matrix &A) : n(A.n)
 {
