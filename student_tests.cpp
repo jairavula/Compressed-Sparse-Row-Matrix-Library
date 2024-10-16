@@ -424,16 +424,32 @@ TEST_CASE( "Method row add 1", "[Matrix]" )
   REQUIRE(A.equal(B));
 }
 
+TEST_CASE( "Method rowAdd2", "[Matrix]" )
+{
+  INFO("Hint: Replace a row with the sum of itself and the scalar multiple of another row (in-place operation)");
+
+  //test case: valid add
+  std::vector<Elem> a = {2,0,1,0,3,0,1,0,4};
+
+  Matrix A = Matrix(a,3);
+  A.rowAdd(1,0,2);
+  REQUIRE(true);
+}
+
 TEST_CASE( "Inverse Modular", "[Matrix]" )
 {
   INFO("Test invmod function");
-  std::vector<Elem> elements = {1,2,3,4,5,6,7,8,9};
-  std::size_t cols = 3;
+  std::vector<Elem> elements = {1,2,3,5,4,7,6,3,7,8,0,3,3,5,2,4};
+  std::size_t cols = 4;
   Matrix A(elements, cols);
 
-  A.invMod(3);
+  std::vector<Elem> elements2 = {2,4,1,6,5,0,4,3,3,1,1,0,3,0,6,6};
+  Matrix B(elements2, cols);
 
-  std::cout << A << std::endl;
+  Matrix C = A.invMod(7);
 
-  REQUIRE(true);
+  std::cout << B << std::endl;
+  std::cout << C << std::endl;
+
+  REQUIRE(C.equal(B));
 }

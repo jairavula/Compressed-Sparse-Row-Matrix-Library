@@ -685,15 +685,15 @@ TEST_CASE( "Method cat", "[Matrix]" )
     }
 }
 
-// TEST_CASE( "Method invMod", "[Matrix]" )
-// {
-//   INFO("Hint: Modular multiplicative inverse, using the modulus m, of a matrix");
-//   Matrix A;
+TEST_CASE( "Method invMod", "[Matrix]" )
+{
+  INFO("Hint: Modular multiplicative inverse, using the modulus m, of a matrix");
+  Matrix A;
 
-//   A = A.invMod(29);
+  A = A.invMod(29);
   
-//   REQUIRE(A.equal(A));
-// }
+  REQUIRE(A.equal(A));
+}
 
 TEST_CASE( "Method rowSwitch", "[Matrix]" )
 {
@@ -758,34 +758,4 @@ TEST_CASE( "Method rowAdd", "[Matrix]" )
 
   REQUIRE_FALSE(A.rowAdd(1,10,2));
   REQUIRE(equality(A, a_add, 3, 3));
-}
-
-TEST_CASE( "Method rowAdd2", "[Matrix]" )
-{
-  INFO("Hint: Replace a row with the sum of itself and the scalar multiple of another row (in-place operation)");
-
-  //test case: valid add
-  std::vector<Elem> a = {2,0,1,0,3,0,1,0,4};
-
-  Matrix A = Matrix(a,3);
-  A.rowAdd(1,0,2);
-  REQUIRE(true);
-}
-
-TEST_CASE( "Inverse Modular", "[Matrix]" )
-{
-  INFO("Test invmod function");
-  std::vector<Elem> elements = {1,2,3,5,4,7,6,3,7,8,0,3,3,5,2,4};
-  std::size_t cols = 4;
-  Matrix A(elements, cols);
-
-  std::vector<Elem> elements2 = {2,4,1,6,5,0,4,3,3,1,1,0,3,0,6,6};
-  Matrix B(elements2, cols);
-
-  Matrix C = A.invMod(7);
-
-  std::cout << B << std::endl;
-  std::cout << C << std::endl;
-
-  REQUIRE(C.equal(B));
 }
