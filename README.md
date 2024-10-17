@@ -4,7 +4,7 @@ This library implements a **Compressed Sparse Row (CSR) matrix** in C++, optimiz
 
 ## What is CSR?
 
-The **Compressed Sparse row** or **Yale** matrix format is useful for large matrices common in data analysis and machine learning. For matrices with sparsely distributed non-zero elements, the CSR format utilizes much less memory overhead than a standard matrix data structure. The CSR format stores the locations and values of non-zero elements within the matrix, therefore implying the location of all zero elements.
+The **Compressed Sparse Row** or **Yale** matrix format is useful for large matrices common in data analysis and machine learning. For matrices with sparsely distributed non-zero elements, the CSR format utilizes much less memory overhead than a standard matrix data structure. The CSR format stores the locations and values of non-zero elements within the matrix, therefore implying the location of all zero elements.
 
 ![Matrix Example](csr.png)
 
